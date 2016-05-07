@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+	
+	<!-- 1.数据源:DriverManagerDataSource -->
+	
+	<!-- <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="username" value="root"></property>
+		<property name="password" value="root"></property>
+		<property name="url" value="jdbc:mysql:///shop?characterEncoding=utf-8"></property>
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+	</bean> -->
+	
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="user" value="root"></property>
+		<property name="password" value="root"></property>
+		<property name="jdbcUrl" value="jdbc:mysql:///e-shop?characterEncoding=utf-8"></property>
+		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+	</bean>
+	
+	<!-- 2.mybatis的SqlSession的工厂:SqlSessionFactoryBean -->
+	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="configLocation" value="classpath:mybatis-config.xml"/>
+	</bean>
+	
+	<!-- 3.mybatis自动扫描加载Sql映射文件:MapperScannerConfigure 
+	
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.hklh8.higou.dao.mapper"></property>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+	</bean>
+	-->
+	<bean id="userMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.hklh8.higou.dao.UserDAO"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
+	<bean id="addressMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.hklh8.higou.dao.AddressDAO"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
+	<bean id="categoryMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.hklh8.higou.dao.CategoryDAO"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
+	<bean id="goodsMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.hklh8.higou.dao.GoodsDAO"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
+	<bean id="orderMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.hklh8.higou.dao.OrderDAO"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
+	<bean id="orderDetailMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.hklh8.higou.dao.OrderDetailDAO"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
+	<!-- 4.事务管理:DataSourceTransactionManager -->
+	
+	<!-- <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	5.使用声明式事务
+	<tx:annotation-driven transaction-manager="txManager"/> -->
+	
+	<bean id="userService" class="com.hklh8.higou.service.impl.UserServiceImpl">
+		<property name="userDAO" ref="userMapper"></property>
+	</bean>
+	<bean id="addressService" class="com.hklh8.higou.service.impl.AddressServiceImpl">
+		<property name="addressDAO" ref="addressMapper"></property>
+	</bean>
+	<bean id="categoryService" class="com.hklh8.higou.service.impl.CategoryServiceImpl">
+		<property name="categoryDAO" ref="categoryMapper"></property>
+		<property name="goodsDAO" ref="goodsMapper"></property>
+	</bean>
+	<bean id="goodsService" class="com.hklh8.higou.service.impl.GoodsServiceImpl">
+		<property name="goodsDAO" ref="goodsMapper"></property>
+		<property name="categoryDAO" ref="categoryMapper"></property>
+	</bean>
+	<bean id="orderService" class="com.hklh8.higou.service.impl.OrderServiceImpl">
+		<property name="orderDAO" ref="orderMapper"></property>
+		<property name="orderDetailDAO" ref="orderDetailMapper"></property>
+	</bean>
+	
+	<bean name="userAction" class="com.hklh8.higou.web.UserAction" scope="prototype">
+		<property name="userService" ref="userService"/>
+	</bean>
+	<bean name="addressAction" class="com.hklh8.higou.web.AddressAction" scope="prototype">
+		<property name="addressService" ref="addressService"/>
+	</bean>
+	<bean name="randomAction" class="com.hklh8.higou.web.RandomAction"  scope="prototype"></bean>
+	<bean name="categoryAction" class="com.hklh8.higou.web.CategoryAction" scope="prototype">
+		<property name="categoryService" ref="categoryService"/>
+	</bean>
+	<bean name="goodsAction" class="com.hklh8.higou.web.GoodsAction" scope="prototype">
+		<property name="categoryService" ref="categoryService"/>
+		<property name="goodsService" ref="goodsService"></property>
+	</bean>
+	
+	<bean name="indexAction" class="com.hklh8.higou.web.IndexAction" scope="prototype">
+		<property name="categoryService" ref="categoryService"/>
+	</bean>
+	<bean name="orderAction" class="com.hklh8.higou.web.OrderAction" scope="prototype">
+		<property name="addressService" ref="addressService"/>
+		<property name="goodsService" ref="goodsService"/>
+		<property name="orderService" ref="orderService"></property>
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="get*" propagation="SUPPORTS" read-only="true"/>
+			<tx:method name="*" propagation="REQUIRED"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+		<aop:pointcut expression="execution(* com.hklh8.higou.service.impl.*.*(..))" id="pc"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="pc"/>
+	</aop:config>
+</beans>

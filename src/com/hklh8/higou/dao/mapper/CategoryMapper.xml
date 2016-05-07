@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.hklh8.higou.dao.CategoryDAO"> 
+	<insert id="addCategory" parameterType="Category">
+		insert into shop_category values(#{id},#{name},#{goodsNum})
+	</insert>
+	<select id="getCategories" resultType="Category">
+		select * from shop_category
+	</select>
+	<update id="updateGoodsNum">
+		update shop_category set goodsnum=goodsnum+#{1} where id=#{0}
+	</update>
+</mapper>

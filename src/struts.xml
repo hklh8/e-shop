@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+	
+	<constant name="struts.objectFactory" value="spring"/>
+	
+	 <package name="higou" extends="json-default" namespace="/">
+	 
+	 	<action name="user_*" class="userAction" method="{1}">
+	 		<result name="regsuc">/login.jsp</result>
+	 		<result name="loginfail">/login.jsp</result>
+	 		<result name="loginsuc" type="redirect">/usercenter/</result>
+	 		<result name="logout">/login.jsp</result>
+	 		<result name="usercenter" type="redirect">/usercenter/</result>
+	 		<result name="adminlogin">/admin/login.jsp</result>
+	 		<result name="adminindex">/admin/index.jsp</result>
+	 	</action>
+	 	<action name="address_*" class="addressAction" method="{1}">
+	 		<result name="list">/usercenter/address_list.jsp</result>
+	 		<result name="oprsuc" type="redirectAction">/address_list</result>
+	 	</action>
+	 	<action name="random" class="randomAction">
+	 		<result type="stream">
+	 			<param name="contentType">image/jpeg</param>
+	 			<param name="inputName">inputStream</param>
+	 		</result>
+	 	</action>
+	 	<action name="category_*" class="categoryAction" method="{1}">
+	 		<result name="oprsuc" type="redirectAction">/category_list</result>
+	 		<result name="list">/admin/category_list.jsp</result>
+	 	</action>
+	 	<action name="goods_*" class="goodsAction" method="{1}">
+	 		<result name="add">/admin/goods_add.jsp</result>
+	 		<result name="list">/admin/goods_list.jsp</result>
+	 		<result name="oprsuc" type="redirect">/goods_listByPage</result>
+	 		<result name="update">/admin/goods_update.jsp</result>
+	 		<result name="updatesuc" type="redirectAction">goods_listByPage</result>
+	 		<result name="delsuc" type="redirectAction">goods_listByPage</result>
+	 		<result name="bycate">/goods_list.jsp</result>
+	 		<result name="view">/goods_view.jsp</result>
+	 		<result name="getgoodsesbyids" type="json">
+	 			<param name="root">result</param>
+	 		</result>
+	 	</action>
+	 	<action name="index" class="indexAction">
+	 		<result name="index">/index.jsp</result>
+	 	</action>
+	 	<action name="order_*" class="orderAction" method="{1}">
+	 		<result name="add">/order_add.jsp</result>
+	 		<result name="submit">/order_submit.jsp</result>
+	 		<result name="list">/admin/order_list.jsp</result>
+	 		<result name="userList">/usercenter/order_list.jsp</result>
+	 		<result name="view">/admin/order_view.jsp</result>
+	 	</action>
+	 	<action name="uIndex" class="orderAction" method="userList">
+	 		<result name="userList">/usercenter/index.jsp</result>
+	 	</action>
+	 </package>
+</struts>

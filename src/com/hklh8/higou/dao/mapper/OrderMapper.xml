@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.hklh8.higou.dao.OrderDAO"> 
+
+	<resultMap type="Order" id="OrderResultMap">
+		<id property="id" column="id"/>
+		<result property="status" column="status"/>
+		<result property="deliveryType" column="deliveryType"/>
+		<result property="payType" column="payType"/>
+		<result property="orderTime" column="orderTime"/>
+		<result property="totalMoney" column="totalMoney"/>
+		<result property="sendTime" column="sendTime"/>
+		<result property="deliveryTime" column="deliveryTime"/>
+		<association property="address" column="address" javaType="Address">
+			<id property="id" column="aid"/>
+			<result property="accept" column="accept"/>
+			<result property="phoneNum" column="phoneNum"/>
+			<result property="mobile" column="mobile"/>
+			<result property="province" column="province"/>
+			<result property="city" column="city"/>
+			<result property="area" column="area"/>
+			<result property="address" column="address"/>
+			<result property="zip" column="zip"/>
+		</association>
+		<collection property="orderDetails" column="orderId" ofType="OrderDetail">
+			<id property="id" column="oid"/>
+			<result property="nums" column="nums"/>
+			<association property="goods" column="goodsId" javaType="Goods">
+				<id property="id" column="gid"/>
+				<result property="name" column="name"/>
+				<result property="price2" column="price2"/>
+			</association>
+		</collection>
+	</resultMap>
+
+	<insert id="addOrder" parameterType="Order">
+		insert into shop_order (id,userId,orderTime,payType,addressId,totalMoney,deliveryType,deliveryTime,status)
+		values(#{id},#{userId},#{orderTime},#{payType},#{addressId},#{totalMoney},#{deliveryType},#{deliveryTime},#{status})
+	</insert>
+	<select id="getOrders" resultMap="OrderResultMap">
+		select o.*,a.accept from shop_order o,shop_address a where o.addressId=a.id order by orderTime desc
+	</select>
+	<select id="getOrderById" resultMap="OrderResultMap">
+		select o.*,od.id oid,od.orderId,od.nums,a.id aid,a.accept,a.province,a.city,a.area,
+		a.address,a.zip,a.phoneNum,a.mobile, g.id gid,g.name,g.price2
+		from shop_order o,shop_orderDetail od,shop_address a,shop_goods g
+		where o.id=#{0} and o.addressId=a.id and od.orderId=o.id and g.id=od.goodsId
+	</select>
+	<select id="getOrdersByUserPage" resultMap="OrderResultMap" parameterType="hashmap">
+		select o.*,a.accept from shop_order o,shop_address a where o.addressId=a.id and o.userId=#{userId} 
+		order by orderTime desc limit #{startNum},#{pageSize}
+	</select>
+	<select id="getOrderNum" resultType="int">
+		select count(*) from shop_order where userId=#{0}
+	</select>
+</mapper>
